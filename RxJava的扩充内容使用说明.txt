@@ -1,0 +1,36 @@
+额外扩充的操作符：
+1》merge：合并多个数据源：
+  1.提示：Observerable.merge(Observerable o1,Observerable o2....);
+ 备注：合并的结果是依次输出的，如果只想要最后一次的结果，根据合并的个数找出最后一次的就是最终的结果，
+  2.具体示例请看项目中mergeData()方法
+2》timer：定时操作。表示“指定秒数后执行指定操作”,
+  1.提示： Observable.timer(2, TimeUnit.SECONDS) 表示指定2秒后执行该动作；
+  2.具体示例请看项目中timer()方法
+3》interval：做周期性操作,表示每隔指定数执行指定的操作
+  1.提示：Observable.interval(2, TimeUnit.SECONDS)表示每隔2秒执行指定动作；
+  2.具体示例请看项目中intervalDeliver()方法
+4》轮询操作：
+  1.提示：
+  //直接进行网络请求，本身就是异步的，已经开启工作线程，不需要自己手动再去写一个线程
+  Schedulers.newThread().createWorker()
+             //第一次在initialDelay时间后执行Action0,之后每次间隔period时间执行Action0
+            .schedulePeriodically(final Action0 action, long initialDelay, long period, TimeUnit unit)
+  主要应用是隔段时间重新请求网络刷新本地数据
+  2.具体示例请看项目中scheduleTask()方法
+5》使用concat和first依次查询(案例是做三级缓存):
+   三级缓存：内存(LruCache)，磁盘(自定义存储路径)，网络
+   1.提示：依次检查memory、disk和network中是否存在数据，任何一步一旦发现数据后面的操作都不执行。
+   Observable.concat(memory, disk, network)
+             .first()
+             //事件发生在子线程
+             .subscribeOn(Schedulers.newThread())
+             //事件消费发生在主线程
+             .observeOn(AndroidSchedulers.mainThread())
+             .subscribe(s);
+   2.具体示例请看项目中concatAndFirstOperation()方法
+
+备注:在不使用RxJava中的观察者和被观察者的时候可以进行移除：
+  //1.使用被观察者的对象(Observable)进行安全移除观察者Subscribe
+  Subscription subscription = obs.unsafeSubscribe(Subscribe对象);
+  subscription.unsubscribe();
+
